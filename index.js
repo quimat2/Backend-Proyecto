@@ -24,13 +24,13 @@ app.use(cors())
 app.get('/', async (req, res) => {
     const Users = await collection(db, 'Users')
     const listUsers = await getDocs(Users)
-/*     const listUsers = Users.docs.map((doc) => ({
+    const resUsers = Users.map((doc) => ({
         id: doc.id,
         ...doc.data()
-    })) */
+    })) 
     res.send({
         'msg': 'success',
-        'data': listUsers
+        'data': resUsers
     })
 })
 
