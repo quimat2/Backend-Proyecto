@@ -1,7 +1,7 @@
 import express from 'express'
 import cors from 'cors'
 import { initializeApp } from 'firebase/app'
-import { getFirestore, collection, getDocs } from "firebase/firestore";
+import { getFirestore, collection, getDocs, setDoc, addDoc } from "firebase/firestore";
 
 const firebaseConfig = {
     apiKey: "AIzaSyC4cxUpS54adoq7FJycfNeQMZXbOWph714",
@@ -22,16 +22,44 @@ app.use(cors())
 
 // Creacion de rutas
 app.get('/', async (req, res) => {
-    const Users = await collection(db, 'Users')
-    const listUsers = await getDocs(Users)
-    const resUsers = Users.map((doc) => ({
-        id: doc.id,
-        ...doc.data()
-    })) 
-    res.send({
-        'msg': 'success',
-        'data': resUsers
-    })
+    try {
+        const Users = await collection(db, 'Users')
+        const listUsers = await getDocs(Users)
+        const aux = []
+        listUsers.forEach((doc) => {
+            const obj = {
+                id: doc.id,
+                ...doc.data()
+            }
+            aux.push(obj)
+        })
+        res.send({
+            'msg': 'success',
+            'data': aux
+        })
+    } catch (error) {
+        res.send({
+            'msg': 'error',
+            'data': error
+        })
+    }
+
+})
+
+app.post('/create', async (req, res) => {
+    try {
+        const body = req.body
+        const Users = await collection(db, 'Users')
+        await addDoc(Users, body)
+        res.send({
+            'msg': 'success'
+        })
+    } catch (error) {
+        res.send({
+            'msg': 'error',
+            'data': error
+        })
+    }
 })
 
 // Prendemos el servidor
