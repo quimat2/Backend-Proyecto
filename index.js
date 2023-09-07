@@ -1,7 +1,7 @@
 import express from 'express'
 import cors from 'cors'
 import { initializeApp } from 'firebase/app'
-import { getFirestore, collection, getDocs, setDoc, addDoc } from "firebase/firestore";
+import { getFirestore, collection, getDocs, addDoc } from "firebase/firestore";
 
 const firebaseConfig = {
     apiKey: "AIzaSyC4cxUpS54adoq7FJycfNeQMZXbOWph714",
@@ -13,7 +13,7 @@ const firebaseConfig = {
 };
 
 const firebase = initializeApp(firebaseConfig)
-const db = getFirestore()
+const db = getFirestore(firebase)
 
 // Settings de la aplicacion
 const app = express()
@@ -60,6 +60,10 @@ app.post('/create', async (req, res) => {
             'data': error
         })
     }
+})
+
+app.get('/delete/:id', async (req, res) => {
+    
 })
 
 // Prendemos el servidor
