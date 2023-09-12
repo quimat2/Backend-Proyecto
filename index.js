@@ -1,7 +1,7 @@
 import express from 'express'
 import cors from 'cors'
 import { initializeApp } from 'firebase/app'
-import { getFirestore, collection, getDocs, addDoc } from "firebase/firestore";
+import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, getDoc } from "firebase/firestore";
 
 const firebaseConfig = {
     apiKey: "AIzaSyC4cxUpS54adoq7FJycfNeQMZXbOWph714",
@@ -15,12 +15,12 @@ const firebaseConfig = {
 const firebase = initializeApp(firebaseConfig)
 const db = getFirestore(firebase)
 
-// Settings de la aplicacion
+// Settings de la aplicación
 const app = express()
 app.use(express.json())
 app.use(cors())
 
-// Creacion de rutas
+// Creación de Rutas
 app.get('/', async (req, res) => {
     try {
         const Users = await collection(db, 'Users')
@@ -28,8 +28,8 @@ app.get('/', async (req, res) => {
         const aux = []
         listUsers.forEach((doc) => {
             const obj = {
-                id: doc.id,
-                ...doc.data()
+            id: doc.id,
+            ...doc.data()
             }
             aux.push(obj)
         })
@@ -43,7 +43,7 @@ app.get('/', async (req, res) => {
             'data': error
         })
     }
-
+    
 })
 
 app.post('/create', async (req, res) => {
@@ -63,10 +63,42 @@ app.post('/create', async (req, res) => {
 })
 
 app.get('/delete/:id', async (req, res) => {
+    //console.log('@@@ param => ', req.params.id)
+    const id = req.params.id
+    try {
+        await deleteDoc(doc(db, 'Users', id))
+        res.send({
+            'msg': 'user deleted'
+        })
+    } catch (error) {
+        res.send({
+            'msg': 'error',
+            'data': error
+        })
+    }
     
+})
+
+app.get('/get-update/:id', async (req, res) => {
+    const id = req.params.id
+
+    const userRef = doc(db, 'Users', id)
+    const user = await getDoc(userRef)
+
+    if (user.exists()) {
+        res.send({
+            'msg': 'success',
+            'data': user.data()
+        })
+    } else {
+        res.send({
+            'msg': 'user does not exist'
+        })
+    }
+
 })
 
 // Prendemos el servidor
 app.listen(9000, () => {
-    console.log('Servidor trabajando')
+    console.log('Servidor Trabajando')
 })
