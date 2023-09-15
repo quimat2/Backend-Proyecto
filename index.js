@@ -1,7 +1,7 @@
 import express from 'express'
 import cors from 'cors'
 import { initializeApp } from 'firebase/app'
-import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, getDoc } from "firebase/firestore";
+import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, getDoc, updateDoc } from "firebase/firestore";
 
 const firebaseConfig = {
     apiKey: "AIzaSyC4cxUpS54adoq7FJycfNeQMZXbOWph714",
@@ -28,8 +28,8 @@ app.get('/', async (req, res) => {
         const aux = []
         listUsers.forEach((doc) => {
             const obj = {
-            id: doc.id,
-            ...doc.data()
+                id: doc.id,
+                ...doc.data()
             }
             aux.push(obj)
         })
@@ -43,7 +43,7 @@ app.get('/', async (req, res) => {
             'data': error
         })
     }
-    
+
 })
 
 app.post('/create', async (req, res) => {
@@ -76,7 +76,7 @@ app.get('/delete/:id', async (req, res) => {
             'data': error
         })
     }
-    
+
 })
 
 app.get('/get-update/:id', async (req, res) => {
@@ -92,10 +92,26 @@ app.get('/get-update/:id', async (req, res) => {
         })
     } else {
         res.send({
-            'msg': 'user does not exist'
+            'msg': 'user doesnt exist'
         })
     }
 
+})
+
+app.post('/update', async (req, res) => {
+    const { id, firstname, lastname, address, city, phone, cp } = req.body
+    const newData = {
+        firstname,
+        lastname,
+        address,
+        city,
+        phone,
+        cp
+    }
+    await updateDoc(doc(db, 'Users', id), newData)
+    res.send({
+        'msg': 'success'
+    })
 })
 
 // Prendemos el servidor
